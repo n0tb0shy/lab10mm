@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 public class GraphConnectivityChecker
@@ -7,7 +6,7 @@ public class GraphConnectivityChecker
     private int[,] _adjacencyMatrix;
     private int _vertexCount;
 
-    public void LoadGraphFromFile(string filePath);//Z:\matmod\1.txt
+    public void LoadGraphFromFile(string filePath)
     {
         if (!File.Exists(filePath))
         {
@@ -15,7 +14,7 @@ public class GraphConnectivityChecker
         }
 
         string[] lines = File.ReadAllLines(filePath);
-        _vertexCount = int.Parse(lines[0]);//Z:\matmod\2.txt
+        _vertexCount = int.Parse(lines[0]);
         _adjacencyMatrix = new int[_vertexCount, _vertexCount];
 
         for (int i = 0; i < _vertexCount; i++)
@@ -76,18 +75,25 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        Console.WriteLine("Программа проверки графа на сильную связность");
-        Console.WriteLine("---------------------------------------------");
+        Console.WriteLine("=== Программа проверки графа на сильную связность ===");
+        Console.WriteLine("(Для выхода введите 'exit' или нажмите Ctrl+C)\n");
 
         var checker = new GraphConnectivityChecker();
 
         while (true)
         {
-            Console.WriteLine("Введите путь к файлу с матрицей смежности или 'exit' для выхода:");
+            Console.Write("Введите путь к файлу с матрицей смежности: ");
             string input = Console.ReadLine()?.Trim();
 
-            if (input?.ToLower() == "exit")
+            if (string.IsNullOrEmpty(input))
             {
+                Console.WriteLine("Путь не может быть пустым. Попробуйте снова.\n");
+                continue;
+            }
+
+            if (input.ToLower() == "exit")
+            {
+                Console.WriteLine("Завершение работы программы...");
                 break;
             }
 
@@ -98,12 +104,20 @@ public class Program
 
                 bool isStronglyConnected = checker.IsStronglyConnected();
                 Console.WriteLine(isStronglyConnected
-                    ? "Граф является сильно связным."
-                    : "Граф НЕ является сильно связным.");
+                    ? "✅ Граф является сильно связным."
+                    : "❌ Граф НЕ является сильно связным.");
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("❌ Ошибка: Файл не найден. Проверьте путь и попробуйте снова.\n");
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("❌ Ошибка: Неверный формат данных в файле. Убедитесь, что матрица задана корректно.\n");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка: {ex.Message}");
+                Console.WriteLine($"❌ Неизвестная ошибка: {ex.Message}\n");
             }
         }
     }
